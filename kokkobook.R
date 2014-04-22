@@ -72,7 +72,9 @@ na <- N * (0.5 * pAa * B + 0.5 * paA * b * B + paa * B)
 xnew <- nA / (nA + na)
 
 # Plot xnew against x, then x against x
-plot(x, xnew, type = 'l')
+plot(x, xnew, type = 'l',
+     xlab = 'Frequency of A in generation 0',
+     ylab = 'Frequency of A males among mating males')
 lines(x, x)
 
 # Converting all this jazz into a function
@@ -81,7 +83,7 @@ lines(x, x)
 # Give m, b, N, B as per definitions in Ch. 2 and accuracy
 # as an integer that specifies how many values between 0 and 1
 # the variable x should take. 
-# Function returns x & xnew & plots the results if plot = TRUE.
+# Function returns x and xnew, and plots the results if plot = TRUE.
 
 sexconflict <- function(m, b, N, B, accuracy, plot = FALSE){
   
@@ -102,7 +104,9 @@ sexconflict <- function(m, b, N, B, accuracy, plot = FALSE){
   xnew <- nA / (nA + na)
   
   if(plot == TRUE){
-    plot(x, xnew, type = 'l')
+    plot(x, xnew, type = 'l',
+         xlab = 'Frequency of A in generation 0',
+         ylab = 'Frequency of A males among mating males')
     lines(x, x)
   }
   
@@ -134,7 +138,6 @@ max(abs(xnew_case1 - xnew_case2))
 
 # I'm not quite sure why this isn't exactly 0, maybe a quirk of how
 # R handles numbers like this? I don't know enough about it...
-# It's close enough to make the point anyway.
 
 
 #####------------------------- CHAPTER 3 -------------------------#####
