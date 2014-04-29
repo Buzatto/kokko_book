@@ -10,7 +10,7 @@ rm(list=ls())  # Clear all
 ## BOX 2.1 ##
 
 # Create a vector with linearly equally spaced values
-x <- seq(from = 0, to = 1, by = 1/101)
+x <- seq(from = 0, to = 1, length = 101)
 
 # Choose a value of m to be investigated
 m <- 5
@@ -43,7 +43,7 @@ lines(x, y3)
 ## BOX 2.2 ##
 
 # Make a vector of 101 values from 0 to 1
-x <- seq(from = 0, to = 1, by = 1/101)
+x <- seq(from = 0, to = 1, length = 101)
 
 # Choose a value of m to be investigated
 m <- 5
@@ -87,7 +87,7 @@ lines(x, x)
 
 sexconflict <- function(m, b, N, B, accuracy, plot = FALSE){
   
-  x <- seq(from = 0, to = 1, by = 1/accuracy)
+  x <- seq(from = 0, to = 1, length = accuracy)
   
   # Calculate  how y depends on x
   y <- (m * x)/(m * x + 1 - x)
@@ -136,8 +136,8 @@ xnew_case2 <- sexconflict(5, 0.5, N_case2, 20, 101, plot = TRUE)
 
 max(abs(xnew_case1 - xnew_case2))
 
-# I'm not quite sure why this isn't exactly 0, maybe a quirk of how
-# R handles numbers like this? I don't know enough about it...
+# TOM:I'm not quite sure why this isn't exactly 0, maybe a quirk of how
+# R handles numbers like this? I don't know enough about it. Suggestions welcome!
 
 
 #####------------------------- CHAPTER 3 -------------------------#####
