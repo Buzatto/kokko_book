@@ -143,3 +143,123 @@ max(abs(xnew_case1 - xnew_case2))
 #####------------------------- CHAPTER 3 -------------------------#####
 
 rm(list=ls())  # Clear all
+
+## BOX 3.1 ##
+
+# Function 'distr_shift'. A graphical explanation for the 
+# shifting distributions, given the additive genetic variance,
+# the initial mean of a distribution, and a and b of the function
+# r(z) = a(z - b).
+# Outputs are the magnitude of the shift, and the old and new
+# distributions f0 & f1, which can be plotted against z.
+
+distr_shift <- function(variance, initial_mean, a, b, plot = TRUE) {
+
+  # We create 201 different values of z that lie between 13 and 17
+  # (note that the function is not very general as we assume the 
+  # initial mean will fall between these values)
+  z <- seq(from = 13, to = 17, length = 201)
+  
+  # The following is the density function of the normal distribution (simplified in R)
+  f <- dnorm(z, mean=initial_mean, sd=sqrt(variance))
+  
+  # Then normalise it to 1. This might not work initially as we only have a selection
+  # of discrete values of z, not 'all possible values'
+  f0 <- f/sum(f)
+  r <- a * (z - b)
+  f1 <- f0 * exp(r) ## New distribution
+  f1 <- f1 / sum(f1) ## Normalise
+  
+  new_mean <- sum(f1 * z)
+  shift <- new_mean - initial_mean
+  
+  # Bundle up the output before plotting as it makes plotting vertical lines a bit easier
+  output <- as.data.frame(cbind(shift, z, f0, f1))
+  
+  # Plot it (this got a bit out of hand...)
+    if(plot == TRUE){
+       plot(z, f0, type = 'l',
+         xlab = 'Body size (z)',
+         ylab = 'Frequency f(z)',
+         ylim = c(0, max(f0) * 1.2))  # add a little extra room for lines atop the curves
+       lines(z, f1)
+       
+       # Add lines & text atop curves showing the magnitude of the shift
+       xf0 <- output$z[output$f0 == max(output$f0)]  # x coordinate for first line
+       xf1 <- output$z[output$f1 == max(output$f1)]  # x coordinate for second line
+       segments(x0 = xf0, x1 = xf0, y0 = max(f0), y1 = max(f0) * 1.1)  # line on first curve
+       segments(x0 = xf1, x1 = xf1, y0 = max(f1), y1 = max(f1) * 1.1)  # line on second curve
+       text(x = (xf0 + xf1)/2, y = max(f0) * 1.18, labels = round(shift, 1))  # Add text
+       
+    }
+    
+  return(shift)
+}
+
+# Test it
+huzzah <- distr_shift(0.1, 15, 1, 15) 
+
+
+## BOX 3.2 ##
+
+# Function 'barnacle'. 'Params' should contain b0, a0, a1, b1
+# arranged in this weird order to make it easy to remember that
+# the sequence of values should be decreasing. 
+# addative_var is the amount of additive genetic variation.
+# TOM: I've made 'generations' an argument, for fun.
+# Output includes the mean value of z over time, and the 
+# predicted equilibrium value (a0 - b0) / (b1 - b0 + a0 - a1).
+
+barnacle <- function(params, additive_var, generations, plot = TRUE)
+{
+  
+  z <- 0.1
+  b0 <- params[1]
+  a0 <- params[2]
+  a1 <- params[3]
+  b1 <- params[4]
+  
+  for (t in 1:(generations - 1)) {
+    
+    # Equation 3.4
+    W <- z[t] * (z[t] / 2 * b1 + (1 - z[t] / 2) * b0) + (1 - z[t]) * ((1 + z[t]) / 2 * a1 + (1 - z[t]) / 2 * a0)
+    
+    # Equation 3.6
+    deltaz <- additive_var / W * (z[t] * (b1 - a1) + (1 - z[t]) * (b0 - a0))
+    
+    # The new z is the old one plus the change that occurred
+    z[t+1] <- z[t] + deltaz
+    
+  }
+  
+  if(plot == TRUE){
+     plot(x = 1:generations, y = z, type = 'l',
+          xlab = 'Generations', 
+          ylab = 'Switchpoint (z)',
+          ylim = c(0, 1))
+  }
+  
+  equilibrium <- (a0 - b0) / (b1 - b0 + a0 - a1)
+  
+  output <- as.data.frame(cbind(z, equilibrium))
+    
+  return(output)
+  
+}
+
+# Test it
+squish <- barnacle(params = c(1.1, 1.05, 1.02, 1), additive_var = 1, generations = 1000)
+
+
+#####------------------------- CHAPTER 4 -------------------------#####
+
+rm(list=ls())  # Clear all
+
+
+
+
+
+
+
+
+
