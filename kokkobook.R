@@ -295,12 +295,12 @@ barnacle <- function(params, additive_var, generations, plot = TRUE)
     
   }
   
-  if(plot == TRUE){
-     plot(x = 1:generations, y = z, type = 'l',
-          xlab = 'Generations', 
-          ylab = 'Switchpoint (z)',
-          ylim = c(0, 1))
-  }
+   if(plot == TRUE){
+    plot(x = 1:generations, y = z, type = 'l',
+         xlab = 'Generations',
+         ylab = 'Switchpoint (z)',
+         ylim = c(0, 1))
+  } else {points(x = 1:generations, y = z, type = 'l')}
   
   equilibrium <- (a0 - b0) / (b1 - b0 + a0 - a1)
   
@@ -311,8 +311,9 @@ barnacle <- function(params, additive_var, generations, plot = TRUE)
 }
 
 # Test it
-squish <- barnacle(params = c(1.1, 1.05, 1.02, 1), additive_var = 1, generations = 1000)
-
+barnacle(params = c(4.5, 4, 2, 1), additive_var = 0.1, generations = 1000)
+barnacle(params = c(1.1, 1.05, 1.02, 1), additive_var = 0.1, generations = 1000, plot=F)
+barnacle(params = c(2, 1.5, 1.42, 1), additive_var = 0.1, generations = 1000, plot=F)
 
 #####------------------------- CHAPTER 4 -------------------------#####
 
