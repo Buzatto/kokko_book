@@ -155,10 +155,15 @@ rm(list=ls())  # Clear all
 
 distr_shift <- function(variance, initial_mean, a, b, plot = TRUE) {
 
-  # We create 201 different values of z that lie between 13 and 17
-  # (note that the function is not very general as we assume the 
-  # initial mean will fall between these values)
-  z <- seq(from = 13, to = 17, length = 201)
+  # We create 201 different values of z that lie within approximately
+  # 12 standard deviations from the mean (6 for each side, to be similar to the 
+  # range in the example). The 6.324555 (instead of just 6) is to make the grid z
+  # be exactly like the one in the example, I arrived at that number through 
+  # 2 / stand.d, because I wanted exactly two units to each side of the mean of 15
+  # (to get from 13 to 17)
+  stand.d <- sqrt(variance)
+  z <- seq(from = (initial_mean - 6.324555*stand.d), to = (initial_mean + 6.324555*stand.d),
+           length = 201)
   
   # The following is the density function of the normal distribution (simplified in R)
   f <- dnorm(z, mean=initial_mean, sd=sqrt(variance))
@@ -198,6 +203,64 @@ distr_shift <- function(variance, initial_mean, a, b, plot = TRUE) {
 
 # Test it
 huzzah <- distr_shift(0.1, 15, 1, 15) 
+
+
+# Now an alternative without normalizing, plotting numbers of individuals,
+# and therefore showing population growth. Initial population size is necessary
+# here.
+
+# Function 'pop_shift'
+
+pop_shift <- function(pop_size, variance, initial_mean, a, b, plot = TRUE) {
+  
+  # We create 201 different values of z that lie within approximately
+  # 12 standard deviations from the mean (6 for each side, to be similar to the 
+  # range in the example). The 6.324555 (instead of just 6) is to make the grid z
+  # be exactly like the one in the example, I arrived at that number through 
+  # 2 / stand.d, because I wanted exactly two units to each side of the mean of 15
+  # (to get from 13 to 17)
+  stand.d <- sqrt(variance)
+  z <- seq(from = (initial_mean - 6.324555*stand.d), to = (initial_mean + 6.324555*stand.d),
+           length = 201)
+  
+  # The following is the density function of the normal distribution (simplified in R)
+  f <- dnorm(z, mean=initial_mean, sd=sqrt(variance))
+  f0 <- f/sum(f)
+  N0 <- f0*pop_size
+  r <- a * (z - b)
+  f1 <- f0 * exp(r) ## New distribution
+  f1 <- f1 / sum(f1) ## Normalise
+  N1 <- N0*exp(r)
+  new_pop_size <- sum(N1) # get new population size
+  
+  new_mean <- sum(N1 * z) / new_pop_size
+  shift <- new_mean - initial_mean
+  
+  # Bundle up the output before plotting as it makes plotting vertical lines a bit easier
+  output <- as.data.frame(cbind(shift, z, N0, N1))
+  
+  # Plot it (this got a bit out of hand...)
+  if(plot == TRUE){
+    plot(z, N0, type = 'h',
+    xlab = 'Body size (z)',
+    ylab = 'Numbers of individuals',
+    ylim = c(0, max(N1) * 1.2)) # add a little extra room for lines atop the curves
+    points(z, N1, type = 'h', col="red")
+    
+    # Add lines & text atop curves showing the magnitude of the shift
+    xN0 <- output$z[output$N0 == max(output$N0)] # x coordinate for first line
+    xN1 <- output$z[output$N1 == max(output$N1)] # x coordinate for second line
+    segments(x0 = xN0, x1 = xN0, y0 = max(N0), y1 = max(N1)*1.1) # line on first curve
+    segments(x0 = xN1, x1 = xN1, y0 = max(N1), y1 = max(N1)* 1.1) # line on second curve
+    text(x = (xN0 + xN1)/2, y = max(N1)*1.15, labels = round(shift, 1)) # Add text
+    arrows(x0 = xN0, x1 = xN1, y0 = max(N1)*1.1, y1 = max(N1)*1.1, length = 0.1, lwd = 2)
+  }
+  
+  return(shift)
+}
+
+# Test it
+pop_shift(10000, 0.1, 15, 1, 15)
 
 
 ## BOX 3.2 ##
