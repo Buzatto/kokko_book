@@ -316,13 +316,56 @@ squish <- barnacle(params = c(1.1, 1.05, 1.02, 1), additive_var = 1, generations
 
 #####------------------------- CHAPTER 4 -------------------------#####
 
-rm(list=ls())  # Clear all
+rm(list=ls()) # Clear all
 
 
+## BOX 4.1 ##
+
+Trait  <- seq(0,2, length=101)
+b <- Trait
+cL <-  2*Trait^2; cH <- Trait^2;
+
+## Plotting figure 4.2
+plot(Trait, b, frame.plot=F, 
+     xlab="Male trait, T", ylab="Benefits and costs",
+     type="l", ylim=c(0,8), lwd=2) # plots the benefits
+points(Trait, cL, type="l") # adds the costs for low quality males
+points(Trait, cH, type="l") # adds the costs for high quality males
+
+# adds letters to identify the lines/curves
+text(x=2, y=2.2, expression(bold(italic("b"))))
+text(x=2, y=4.2, expression(bold(italic("c"))[H]))
+text(x=2, y=8.2, expression(bold(italic("c"))[L]))
 
 
+## Plotting figure 4.3
+WL <-  b-cL; WH <- b-cH;
+plot(Trait, WL, frame.plot=F, 
+     xlab="Male trait, T", ylab="Net benefit",
+     type="l", ylim=c(0,0.5), xlim=c(0,1),lwd=2) # plots WL
+points(Trait, WH, type="l", lwd=2) # adds WH
+grid(10,10) #adds a grid, Hanna mentions that in the book, but the grid isn't in Fig 4.3.
 
+## bind Trait, WL and WH together, to find maxima and draw arrows
+find.max <- data.frame(Trait, WL, WH)
+arrows(x0 = mean(find.max$Trait[find.max$WL==max(WL)]),
+       y0 = 0.08, y1 = max(WL), length = 0.1, lwd = 2)
+arrows(x0 = mean(find.max$Trait[find.max$WH==max(WH)]),
+       y0 = 0.15, y1 = max(WH), length = 0.1, lwd = 2)
 
+text(x=mean(find.max$Trait[find.max$WL==max(WL)]),
+     y=0.05, expression(bold(italic("W"))[L]))
+text(x=mean(find.max$Trait[find.max$WH==max(WH)]),
+     y=0.12, expression(bold(italic("W"))[H]))
 
+# Hanna also included Matlab code to zoom in the plot, but you can do that
+# in R by just increasing the window with the mouse.
 
+## Plotting figure 4.4 (not in Box 4.1, but still useful!)
 
+optimal.T <- function(alpha) {1/(2*alpha)}
+alpha <- seq(0,2, length=101)
+
+plot(alpha, optimal.T(alpha), type="l", frame.plot=F, ylim=c(0,20),
+     xlab=expression(paste("Cost coefficient, ")~symbol(a)), 
+     ylab=expression(paste("Optimal trait value,")~italic(T)~paste("*")))
