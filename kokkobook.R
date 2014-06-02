@@ -369,3 +369,52 @@ alpha <- seq(0,2, length=101)
 plot(alpha, optimal.T(alpha), type="l", frame.plot=F, ylim=c(0,20),
      xlab=expression(paste("Cost coefficient, ")~symbol(a)), 
      ylab=expression(paste("Optimal trait value,")~italic(T)~paste("*")))
+
+
+## BOX 4.2 ##
+
+maledisplay <- function(resource.range, resolution, plot=T) {
+  
+  Trait <- numeric(0)
+  Seasons <- numeric(0)
+  Fit <- numeric(0)
+  R <- seq(resource.range[1], resource.range[2], length = 100)
+  
+  for(i in 1:length(R)) {
+    trait <- seq(0, R[i], length=resolution)
+    net.condition <- R[i] - trait
+    survival <- 1 / (1 + exp(-10*(net.condition - 0.5)))
+    future.mating.seasons <- survival / (1 - survival)
+    m <- trait
+    fitness <- m + m*future.mating.seasons
+    finding.max <- data.frame(trait, net.condition, survival, future.mating.seasons, m, fitness)
+    best.fitness <- finding.max[finding.max$fitness==max(finding.max$fitness),]
+    
+    #storing results
+    Trait[i] <- as.numeric(best.fitness[1,1])
+    Seasons[i] <- as.numeric(1 + best.fitness[1,4])
+    Fit[i] <- as.numeric(best.fitness[1,6])
+  }
+  
+  output <- data.frame(cbind(R, Trait, Seasons, Fit))
+
+  if(plot == TRUE){
+    par(mfrow=c(3,1))
+    plot(output$R, output$Trait, type = 'l', xlab = '', ylab = 'Male trait', frame.plot=F)
+    plot(output$R, output$Seasons, type = 'l', xlab = '', ylim=c(0, max(output$Seasons)+1),
+         ylab = 'Expected number of mating seasons', frame.plot=F)
+    plot(output$R, output$Fit, type = 'l',
+         xlab = expression(paste("Male resources,")~italic(R)),
+         ylab = 'Fitness', frame.plot=F)
+  }
+  
+  return(output)
+  
+}
+
+maledisplay(c(0, 0.2), resolution=1000) # generates Figure 4.7
+
+maledisplay(c(0.8, 1), resolution=1000) # generates Figure 4.8
+maledisplay(c(0.8, 1), resolution=10000) # smoother version of Figure 4.8
+
+maledisplay(c(0, 1), resolution=1000) # generates Figure 4.9
